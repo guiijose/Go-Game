@@ -12,7 +12,6 @@ def digits(num):
         num //= 10
     return digitos
 
-
 def eh_territorio(arg):
     # verificar se o argumento (território) é um tuplo e se o tuplo não é vazio
     if type(arg) is not tuple or len(arg) == 0:
@@ -92,38 +91,90 @@ def ordena_intersecoes(arg):
     # a função sorted devolve uma lista, por isso usamos a funçã tuple para a converter num tuplo
     return tuple(sorted(arg, key=lambda x: (x[1], x[0])))
 
-
 def territorio_para_str(t):
     if not eh_territorio:
         raise ValueError('território não válido')
     altura = len(t[0])
     largura = len(t)
     territorio = "  "
-    for i in range(largura):
+    for i in range(largura): # adiciona primeira linha com as letras
         territorio += f" {chr(65 + i)}"
     territorio += '\n'
 
-    for j in range(altura):
+    for j in range(altura): # itera por n linhas sendo n o valor da altura
         territorio = territorio + (2 - digits(altura - j)) * " " + f"{altura - j} " 
-        for x in range(largura):
+        for x in range(largura): # iteram por n colunas sendo n o valor da largura
             intersecao = '. ' if t[x][altura - j - 1] == 0 else 'X '
             territorio += intersecao
         territorio = territorio + (2 - digits(altura - j)) * " " + f"{altura - j}\n" 
     territorio += "  "
-    for i in range(largura):
+    for i in range(largura): # adiciona a ulitma linha com as letras
         territorio += f" {chr(65 + i)}"
     return territorio
 
-t = ((0,1,0,0),(0,0,0,0),(0,0,1,0),(1,0,0,0),(0,0,0,0))
-t2 = '   A B C D E\n 4 . . . . .  4\n 3 . . X . .  3\n 2 X . . . .  2\n 1 . . . X .  1\n   A B C D E'
-print(territorio_para_str(t))
-print(t2)
+def adjacentes_tipo(t, i):
+    adjacentes = obtem_intersecoes_adjacentes(t, i)
+    adjacentes_livres = ()
+    for adjacente in adjacentes:
+        if eh_intersecao_livre(t, i):
+            if eh_intersecao_livre(t, adjacente):
+                adjacentes_livres += (adjacente,)
+        else:
+            if not eh_intersecao_livre(t, adjacente):
+                adjacentes_livres += (adjacente,)
 
-def obtem_cadeia():
-    pass
+    return adjacentes_livres
 
-def obtem_vale():
-    pass
+def obtem_cadeia(t, i):
+    if not eh_intersecao_valida(t, i):
+        raise ValueError('obtem_cadeia: argumentos inválidos')
+    
+    cadeia = adjacentes_tipo(t, i) + (i,)
+    iterador = list(cadeia)
+    adicionado = True
+
+    while adicionado:
+        adicionado = False
+        novos_adjacentes = []
+        
+        for intersecao in iterador:
+            novas_intersecoes = adjacentes_tipo(t, intersecao)
+            for adjacente in novas_intersecoes:
+                if adjacente not in cadeia and adjacente not in novos_adjacentes:
+                    novos_adjacentes.append(adjacente)
+                    adicionado = True
+        
+        for novo_adjacente in novos_adjacentes:
+            cadeia += (novo_adjacente,)
+            iterador.append(novo_adjacente)
+    
+    return ordena_intersecoes(cadeia)
+
+def obtem_vale(t, i):
+    if not eh_intersecao_valida(t, i) or not eh_intersecao_livre:
+        raise ValueError('obtem_vale: argumentos inválidos')
+    
+    vale = adjacentes_tipo(t, i) + (i,)
+    iterador = list(vale)
+    adicionado = True
+
+    while adicionado:
+        adicionado = False
+        novos_adjacentes = []
+        
+        for intersecao in iterador:
+            novas_intersecoes = adjacentes_tipo(t, intersecao)
+            for adjacente in novas_intersecoes:
+                adjacentes_vazios = len(adjacentes_tipo(t, adjacente))
+                if adjacente not in vale and adjacente not in novos_adjacentes and adjacentes_vazios != 4:
+                    novos_adjacentes.append(adjacente)
+                    adicionado = True
+        
+        for novo_adjacente in novos_adjacentes:
+            vale += (novo_adjacente,)
+            iterador.append(novo_adjacente)
+    
+    return ordena_intersecoes(vale)
 
 def verifica_conexao():
     pass
