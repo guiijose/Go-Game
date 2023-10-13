@@ -92,6 +92,53 @@ def ordena_intersecoes(arg):
     # a função sorted devolve uma lista, por isso usamos a funçã tuple para a converter num tuplo
     return tuple(sorted(arg, key=lambda x: (x[1], x[0])))
 
+
+def territorio_para_str(t):
+    if not eh_territorio:
+        raise ValueError('território não válido')
+    altura = len(t[0])
+    largura = len(t)
+    territorio = "  "
+    for i in range(largura):
+        territorio += f" {chr(65 + i)}"
+    territorio += '\n'
+
+    for j in range(altura):
+        territorio = territorio + (2 - digits(altura - j)) * " " + f"{altura - j} " 
+        for x in range(largura):
+            intersecao = '. ' if t[x][altura - j - 1] == 0 else 'X '
+            territorio += intersecao
+        territorio = territorio + (2 - digits(altura - j)) * " " + f"{altura - j}\n" 
+    territorio += "  "
+    for i in range(largura):
+        territorio += f" {chr(65 + i)}"
+    return territorio
+
+t = ((0,1,0,0),(0,0,0,0),(0,0,1,0),(1,0,0,0),(0,0,0,0))
+t2 = '   A B C D E\n 4 . . . . .  4\n 3 . . X . .  3\n 2 X . . . .  2\n 1 . . . X .  1\n   A B C D E'
+print(territorio_para_str(t))
+print(t2)
+
+def obtem_cadeia():
+    pass
+
+def obtem_vale():
+    pass
+
+def verifica_conexao():
+    pass
+
+def calcula_numero_montanhas():
+    pass
+
+def calcula_numero_cadeias_montanhas():
+    pass
+
+def calcula_tamanho_vales():
+    pass
+
+
+"""
 def territorio_para_str(t):
     if not eh_territorio(t):
         raise ValueError('argumento não válido')
@@ -123,29 +170,11 @@ def territorio_para_str(t):
 
 
     return territorio
-        
-t=((1,1,1,0,0,0,0,0,1,1),)
-t2 = '   A\n10 X 10\n 9 X  9\n 8 .  8\n 7 .  7\n 6 .  6\n 5 .  5\n 4 .  4\n 3 X  3\n 2 X  2\n 1 X  1\n   A'
-print(territorio_para_str(t))
-print(t2)
-
-def obtem_cadeia():
-    pass
-
-def obtem_vale():
-    pass
-
-def verifica_conexao():
-    pass
-
-def calcula_numero_montanhas():
-    pass
-
-def calcula_numero_cadeias_montanhas():
-    pass
-
-def calcula_tamanho_vales():
-    pass
 
 
+    t=((1,1,1,0,0,0,0,0,1,1),)
+    t2 = '   A\n10 X 10\n 9 X  9\n 8 .  8\n 7 .  7\n 6 .  6\n 5 .  5\n 4 .  4\n 3 X  3\n 2 X  2\n 1 X  1\n   A'
+    print(territorio_para_str(t))
+    print(t2)
 
+"""
