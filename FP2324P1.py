@@ -2,7 +2,9 @@
 # projeto 1
 
 
-# função que devolve o número de digitos de um número
+"""
+As primeiras funções são funções auxiliares
+"""
 def digits(num):
     if type(num) is not int:
         raise ValueError('argumento inválido')
@@ -11,6 +13,32 @@ def digits(num):
         digitos += 1
         num //= 10
     return digitos
+
+def adjacentes_tipo(t, i): # esta função obtem as interseções adjacentes que são livres ou montanhas consoante o parâmetro i
+    adjacentes = obtem_intersecoes_adjacentes(t, i)
+    adjacentes_livres = ()
+    for adjacente in adjacentes:
+        if eh_intersecao_livre(t, i):
+            if eh_intersecao_livre(t, adjacente):
+                adjacentes_livres += (adjacente,)
+        else:
+            if not eh_intersecao_livre(t, adjacente):
+                adjacentes_livres += (adjacente,)
+
+    return adjacentes_livres
+
+def adjacentes_tipo_diferente(t, i):
+    adjacentes = obtem_intersecoes_adjacentes(t, i)
+    adjacentes_diferentes = ()
+    for adjacente in adjacentes:
+        if eh_intersecao_livre(t, i):
+            if not eh_intersecao_livre(t, adjacente):
+                adjacentes_diferentes += (adjacente,)
+        else:
+            if eh_intersecao_livre(t, adjacente):
+                adjacentes_diferentes += (adjacente,)
+
+    return adjacentes_diferentes
 
 def eh_territorio(arg):
     # verificar se o argumento (território) é um tuplo e se o tuplo não é vazio
@@ -30,14 +58,14 @@ def eh_territorio(arg):
 def obtem_ultima_intersecao(t):
     # verificar se o território é falso
     if not eh_territorio(t):
-        raise ValueError('argumento inválido')
+        return False
     # devolver a última coordenada
     return (chr(len(t) + 64), len(t[0]))
 
 def eh_intersecao(arg):
     # verificar se o argumento (interseção é um tuplo)
     if not isinstance(arg, tuple):
-        raise ValueError('argumento inválido')
+        return False
     # verificar se dentro do tuplo o primeiro argumento é uma letra maiúscula e se o segundo é um inteiro entre 1 e 99
     if len(arg) != 2 or not isinstance(arg[0], str) or not isinstance(arg[1], int) or not arg[0].isupper() or not 1 <= arg[1] <= 99:
         return False
@@ -55,7 +83,7 @@ def eh_intersecao_valida(t, i):
 def eh_intersecao_livre(t, i):
     # verificar se o território e a interseção são compatíveis
     if not eh_intersecao_valida(t, i):
-        raise ValueError('parâmetros inválidos')
+        return False
     # verificar se a coordenada corresponde a um 0 ou 1
     if t[ord(i[0]) - 65][i[1] - 1] == 1:
         return False
@@ -65,7 +93,7 @@ def eh_intersecao_livre(t, i):
 def obtem_intersecoes_adjacentes(t, i):
     # vericar se o território e a interseção são compatíveis
     if not eh_intersecao_valida(t, i):
-        raise ValueError
+        return False
     # criar um tuplo das coordenadas adjacentes e verificar as 4 possíveis coordenadas adjacentes
     # se a coordenada adjacente for válida, adicionamos ao tuplo
     adjacentes = ()
@@ -82,7 +110,7 @@ def obtem_intersecoes_adjacentes(t, i):
 def ordena_intersecoes(arg):
     # verificar se o argumento é um tuplo
     if type(arg) is not tuple:
-        raise ValueError('argumentos inválidos')
+        return False
     # verificar se cada tuplo é uma interseção
     for item in arg:
         if type(item) is not tuple and not eh_intersecao(item):
@@ -93,7 +121,7 @@ def ordena_intersecoes(arg):
 
 def territorio_para_str(t):
     if not eh_territorio:
-        raise ValueError('território não válido')
+        raise ValueError('territorio_para_str: argumento invalido')
     altura = len(t[0])
     largura = len(t)
     territorio = "  "
@@ -111,19 +139,6 @@ def territorio_para_str(t):
     for i in range(largura): # adiciona a ulitma linha com as letras
         territorio += f" {chr(65 + i)}"
     return territorio
-
-def adjacentes_tipo(t, i):
-    adjacentes = obtem_intersecoes_adjacentes(t, i)
-    adjacentes_livres = ()
-    for adjacente in adjacentes:
-        if eh_intersecao_livre(t, i):
-            if eh_intersecao_livre(t, adjacente):
-                adjacentes_livres += (adjacente,)
-        else:
-            if not eh_intersecao_livre(t, adjacente):
-                adjacentes_livres += (adjacente,)
-
-    return adjacentes_livres
 
 def obtem_cadeia(t, i):
     if not eh_intersecao_valida(t, i):
@@ -151,81 +166,60 @@ def obtem_cadeia(t, i):
     return ordena_intersecoes(cadeia)
 
 def obtem_vale(t, i):
-    if not eh_intersecao_valida(t, i) or not eh_intersecao_livre:
-        raise ValueError('obtem_vale: argumentos inválidos')
-    
-    vale = adjacentes_tipo(t, i) + (i,)
-    iterador = list(vale)
-    adicionado = True
+    if eh_intersecao_livre(t, i):
+        raise ValueError("obtem_vale: argumentos invalidos")
+    cadeia = obtem_cadeia(t, i)
+    vales = ()
+    for montanha in cadeia:
+        for vale in adjacentes_tipo_diferente(t, montanha):
+            if vale not in vales:
+                vales += (vale,)
+    return vales
 
-    while adicionado:
-        adicionado = False
-        novos_adjacentes = []
-        
-        for intersecao in iterador:
-            novas_intersecoes = adjacentes_tipo(t, intersecao)
-            for adjacente in novas_intersecoes:
-                adjacentes_vazios = len(adjacentes_tipo(t, adjacente))
-                if adjacente not in vale and adjacente not in novos_adjacentes and adjacentes_vazios != 4:
-                    novos_adjacentes.append(adjacente)
-                    adicionado = True
-        
-        for novo_adjacente in novos_adjacentes:
-            vale += (novo_adjacente,)
-            iterador.append(novo_adjacente)
-    
-    return ordena_intersecoes(vale)
+def verifica_conexao(t, i1, i2):
+    if not eh_intersecao_valida(t, i1) or not eh_intersecao_valida(t, i2):
+        raise ValueError('verifica_conexao: argumentos invalidos')
+    if i1 in obtem_cadeia(t, i2):
+        return True
+    return False
 
-def verifica_conexao():
-    pass
-
-def calcula_numero_montanhas():
-    pass
-
-def calcula_numero_cadeias_montanhas():
-    pass
-
-def calcula_tamanho_vales():
-    pass
-
-
-"""
-def territorio_para_str(t):
+def calcula_numero_montanhas(t):
     if not eh_territorio(t):
-        raise ValueError('argumento não válido')
-    max_digits = digits(len(t[0]))
-    territorio = '   ' + (2 - max_digits) * ' '
-    # primeira linha de letras
-    for j in range(len(t)):
-        if j == len(t) - 1:
-            territorio += f'{chr(65 + j)}\n'
-        else:
-            territorio += f'{chr(65 + j)} '
-    # loop por cada uma das linhas
-    for i in range(len(t[0])):
-        number = len(t[0]) - i
-
-        territorio = territorio + (f' {number} ') + (max_digits - digits(number)) * ' '
+        raise ValueError("calcula_numero_montanhas: argumento invalido")
+    contador = 0
+    for y in range(len(t[0])):
         for x in range(len(t)):
-            if t[x][len(t[0]) - i - 1] == 1 :
-                territorio += 'X '
-            elif t[x][len(t[0]) - i - 1] == 0:
-                territorio += '. '
-        territorio += f' {number}\n'
-    territorio = territorio + '   ' + (2 - x) * ' '
-    for j in range(len(t)):
-        if j == len(t) - 1:
-            territorio += f'{chr(65 + j)}'
-        else:
-            territorio += f'{chr(65 + j)} '
+            if t[x][y] == 1:
+                contador += 1
+    return contador
 
 
-    return territorio
+def calcula_numero_cadeias_montanhas(t):
+    if not eh_territorio(t):
+        raise ValueError("calcula_numero_montanhas: argumentos invalidos")
+    cadeias = ()
+    for y in range(len(t[0])):
+        for x in range(len(t)):
+            if t[x][y] == 1 and obtem_cadeia(t, (chr(65 + x), y + 1)) not in cadeias:
+                print(f'x: {x}, y: {y}')
+                cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
+    return len(cadeias)
+
+def calcula_tamanho_vales(t):
+    vales = ()
+    contador = 0
+    for y in range(len(t[0])):
+        for x in range(len(t)):
+            if not eh_intersecao_livre(t, (chr(65 + x), y + 1)):
+                novo_vale = obtem_vale(t, (chr(65 + x), y + 1))
+                for vale in novo_vale:
+                    if vale not in vales:
+                        vales += (vale, )
+                        contador += 1
+
+    return len(vales)
 
 
-    t=((1,1,1,0,0,0,0,0,1,1),)
-    t2 = '   A\n10 X 10\n 9 X  9\n 8 .  8\n 7 .  7\n 6 .  6\n 5 .  5\n 4 .  4\n 3 X  3\n 2 X  2\n 1 X  1\n   A'
-    print(territorio_para_str(t))
-    print(t2)
-
-"""
+t = ((1,1,1,0),(0,1,0,0),(0,0,1,0),(0,0,0,0),(0,0,0,0))
+print(territorio_para_str(t))
+print(calcula_tamanho_vales(t))
