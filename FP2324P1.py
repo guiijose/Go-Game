@@ -43,13 +43,14 @@ def adjacentes_tipo_diferente(t, i):
 def eh_territorio(arg):
     if type(arg) is not tuple or not 0 < len(arg) < 27:
         return False
-    try:
-        altura = len(arg[0])
-    except TypeError:
-        return False
+    altura = None
         
     for coluna in arg:
-        if type(coluna) is not tuple or not 0 < len(coluna) < 100  or len(coluna) != altura:
+        if type(coluna) is not tuple or not 0 < len(coluna) < 100 :
+            return False
+        elif altura == None:
+            altura = len(coluna)
+        elif len(coluna) != altura:
             return False
         for coordenada in coluna:
             if coordenada != 0 and coordenada != 1:
@@ -142,7 +143,7 @@ def territorio_para_str(t):
 
 def obtem_cadeia(t, i):
     if not eh_intersecao_valida(t, i):
-        raise ValueError('obtem_cadeia: argumentos inválidos')
+        raise ValueError('obtem_cadeia: argumentos invalidos')
     
     cadeia = adjacentes_tipo(t, i) + (i,)
     iterador = list(cadeia)
@@ -210,6 +211,8 @@ def calcula_tamanho_vales(t):
     for y in range(len(t[0])):
         for x in range(len(t)):
             if not eh_intersecao_livre(t, (chr(65 + x), y + 1)):
+                if not obtem_vale(t, (chr(65 + x), y + 1)):
+                    raise ValueError("calcula_tamanho_vales: argumento invalido")
                 novo_vale = obtem_vale(t, (chr(65 + x), y + 1))
                 for vale in novo_vale:
                     if vale not in vales:
