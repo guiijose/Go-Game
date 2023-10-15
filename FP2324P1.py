@@ -200,7 +200,6 @@ def calcula_numero_cadeias_montanhas(t):
     for y in range(len(t[0])):
         for x in range(len(t)):
             if t[x][y] == 1 and obtem_cadeia(t, (chr(65 + x), y + 1)) not in cadeias:
-                print(f'x: {x}, y: {y}')
                 cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
     return len(cadeias)
 
