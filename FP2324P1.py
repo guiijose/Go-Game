@@ -1,7 +1,7 @@
 # This is the Python script for your project
 # projeto 1
 
-def eh_territorio(arg): # assert not true (já coloquei que as coordenadas não podem ser floats)
+def eh_territorio(arg): 
     if type(arg) is not tuple or not 0 < len(arg) < 27:
         return False
     try:
@@ -128,24 +128,15 @@ def obtem_cadeia(t, i):
         return adjacentes_livres
     
     cadeia = adjacentes_tipo(t, i) + (i,)
-    iterador = list(cadeia)
     adicionado = True
-
     while adicionado:
         adicionado = False
-        novos_adjacentes = []
-        
-        for intersecao in iterador:
-            novas_intersecoes = adjacentes_tipo(t, intersecao)
-            for adjacente in novas_intersecoes:
-                if adjacente not in cadeia and adjacente not in novos_adjacentes:
-                    novos_adjacentes.append(adjacente)
+        for intersecao in cadeia:
+            nova_cadeia = adjacentes_tipo(t, intersecao)
+            for nova_intersecao in nova_cadeia:
+                if nova_intersecao not in cadeia:
+                    cadeia += (nova_intersecao,)
                     adicionado = True
-        
-        for novo_adjacente in novos_adjacentes:
-            cadeia += (novo_adjacente,)
-            iterador.append(novo_adjacente)
-    
     return ordena_intersecoes(cadeia)
 
 def obtem_vale(t, i):
@@ -197,8 +188,9 @@ def calcula_numero_cadeias_montanhas(t):
     cadeias = ()
     for y in range(len(t[0])):
         for x in range(len(t)):
-            if t[x][y] == 1 and obtem_cadeia(t, (chr(65 + x), y + 1)) not in cadeias:
-                cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
+            cadeia = obtem_cadeia(t, (chr(65 + x), y + 1))
+            if t[x][y] == 1 and cadeia not in cadeias:
+                cadeias += (cadeia,)
     return len(cadeias)
 
 def calcula_tamanho_vales(t):
