@@ -1,15 +1,6 @@
 # This is the Python script for your project
 # projeto 1
 
-
-"""
-As primeiras funções são funções auxiliares
-"""
-
-
-
-
-
 def eh_territorio(arg): # assert not true (já coloquei que as coordenadas não podem ser floats)
     if type(arg) is not tuple or not 0 < len(arg) < 27:
         return False
@@ -119,7 +110,7 @@ def territorio_para_str(t):
         territorio += f" {chr(65 + i)}"
     return territorio
 
-def obtem_cadeia(t, i): # é necessário melhorar o código
+def obtem_cadeia(t, i): 
     if not eh_intersecao_valida(t, i):
         raise ValueError('obtem_cadeia: argumentos invalidos')
     
@@ -210,9 +201,10 @@ def calcula_numero_cadeias_montanhas(t):
                 cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
     return len(cadeias)
 
-def calcula_tamanho_vales(t): # assertion error e value error
+def calcula_tamanho_vales(t):
+    if not eh_territorio(t):
+        raise ValueError( 'calcula_tamanho_vales: argumento invalido')
     vales = ()
-    contador = 0
     for y in range(len(t[0])):
         for x in range(len(t)):
             if not eh_intersecao_livre(t, (chr(65 + x), y + 1)):
@@ -220,6 +212,5 @@ def calcula_tamanho_vales(t): # assertion error e value error
                 for vale in novo_vale:
                     if vale not in vales:
                         vales += (vale, )
-                        contador += 1
 
     return len(vales)
