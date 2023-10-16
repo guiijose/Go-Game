@@ -5,55 +5,24 @@
 """
 As primeiras funções são funções auxiliares
 """
-def digits(num):
-    if type(num) is not int:
-        raise ValueError('argumento inválido')
-    digitos = 0
-    while num != 0:
-        digitos += 1
-        num //= 10
-    return digitos
 
-def adjacentes_tipo(t, i): # esta função obtem as interseções adjacentes que são livres ou montanhas consoante o parâmetro i
-    adjacentes = obtem_intersecoes_adjacentes(t, i)
-    adjacentes_livres = ()
-    for adjacente in adjacentes:
-        if eh_intersecao_livre(t, i):
-            if eh_intersecao_livre(t, adjacente):
-                adjacentes_livres += (adjacente,)
-        else:
-            if not eh_intersecao_livre(t, adjacente):
-                adjacentes_livres += (adjacente,)
 
-    return adjacentes_livres
 
-def adjacentes_tipo_diferente(t, i):
-    adjacentes = obtem_intersecoes_adjacentes(t, i)
-    adjacentes_diferentes = ()
-    for adjacente in adjacentes:
-        if eh_intersecao_livre(t, i):
-            if not eh_intersecao_livre(t, adjacente):
-                adjacentes_diferentes += (adjacente,)
-        else:
-            if eh_intersecao_livre(t, adjacente):
-                adjacentes_diferentes += (adjacente,)
 
-    return adjacentes_diferentes
 
-def eh_territorio(arg):
+def eh_territorio(arg): # assert not true (já coloquei que as coordenadas não podem ser floats)
     if type(arg) is not tuple or not 0 < len(arg) < 27:
         return False
-    altura = None
+    try:
+        altura = len(arg[0])
+    except TypeError:
+        return False
         
     for coluna in arg:
-        if type(coluna) is not tuple or not 0 < len(coluna) < 100 :
-            return False
-        elif altura == None:
-            altura = len(coluna)
-        elif len(coluna) != altura:
+        if type(coluna) is not tuple or not 0 < len(coluna) < 100  or len(coluna) != altura:
             return False
         for coordenada in coluna:
-            if coordenada != 0 and coordenada != 1:
+            if type(coordenada) is not int or coordenada not in (0, 1):
                 return False
     return True
 
@@ -122,6 +91,16 @@ def ordena_intersecoes(arg):
 def territorio_para_str(t):
     if not eh_territorio(t):
         raise ValueError('territorio_para_str: argumento invalido')
+    
+    def digits(num):
+        if type(num) is not int:
+            raise ValueError('argumento inválido')
+        digitos = 0
+        while num != 0:
+            digitos += 1
+            num //= 10
+        return digitos
+    
     altura = len(t[0])
     largura = len(t)
     territorio = "  "
@@ -140,10 +119,22 @@ def territorio_para_str(t):
         territorio += f" {chr(65 + i)}"
     return territorio
 
-
-def obtem_cadeia(t, i):
+def obtem_cadeia(t, i): # é necessário melhorar o código
     if not eh_intersecao_valida(t, i):
         raise ValueError('obtem_cadeia: argumentos invalidos')
+    
+    def adjacentes_tipo(t, i): 
+        adjacentes = obtem_intersecoes_adjacentes(t, i)
+        adjacentes_livres = ()
+        for adjacente in adjacentes:
+            if eh_intersecao_livre(t, i):
+                if eh_intersecao_livre(t, adjacente):
+                    adjacentes_livres += (adjacente,)
+            else:
+                if not eh_intersecao_livre(t, adjacente):
+                    adjacentes_livres += (adjacente,)
+
+        return adjacentes_livres
     
     cadeia = adjacentes_tipo(t, i) + (i,)
     iterador = list(cadeia)
@@ -169,6 +160,21 @@ def obtem_cadeia(t, i):
 def obtem_vale(t, i):
     if not eh_intersecao_valida(t, i) or eh_intersecao_livre(t, i):
         raise ValueError("obtem_vale: argumentos invalidos")
+    
+    def adjacentes_tipo_diferente(t, i):
+        adjacentes = obtem_intersecoes_adjacentes(t, i)
+        adjacentes_diferentes = ()
+        for adjacente in adjacentes:
+            if eh_intersecao_livre(t, i):
+                if not eh_intersecao_livre(t, adjacente):
+                    adjacentes_diferentes += (adjacente,)
+            else:
+                if eh_intersecao_livre(t, adjacente):
+                    adjacentes_diferentes += (adjacente,)
+
+        return adjacentes_diferentes
+
+
     cadeia = obtem_cadeia(t, i)
     vales = ()
     for montanha in cadeia:
@@ -204,15 +210,12 @@ def calcula_numero_cadeias_montanhas(t):
                 cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
     return len(cadeias)
 
-
-def calcula_tamanho_vales(t):
+def calcula_tamanho_vales(t): # assertion error e value error
     vales = ()
     contador = 0
     for y in range(len(t[0])):
         for x in range(len(t)):
             if not eh_intersecao_livre(t, (chr(65 + x), y + 1)):
-                if not obtem_vale(t, (chr(65 + x), y + 1)):
-                    raise ValueError("calcula_tamanho_vales: argumento invalido")
                 novo_vale = obtem_vale(t, (chr(65 + x), y + 1))
                 for vale in novo_vale:
                     if vale not in vales:
