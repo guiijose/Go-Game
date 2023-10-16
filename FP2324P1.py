@@ -185,13 +185,16 @@ def calcula_numero_montanhas(t):
 def calcula_numero_cadeias_montanhas(t):
     if not eh_territorio(t):
         raise ValueError("calcula_numero_cadeias_montanhas: argumento invalido")
-    cadeias = ()
+    cadeia_unica = set()
+    
     for y in range(len(t[0])):
         for x in range(len(t)):
-            cadeia = obtem_cadeia(t, (chr(65 + x), y + 1))
-            if t[x][y] == 1 and cadeia not in cadeias:
-                cadeias += (cadeia,)
-    return len(cadeias)
+            if t[x][y] == 1:
+                cadeia = obtem_cadeia(t, (chr(65 + x), y + 1))
+                cadeia_unica.add(cadeia)
+    
+    return len(cadeia_unica)
+
 
 def calcula_tamanho_vales(t):
     if not eh_territorio(t):
@@ -205,4 +208,23 @@ def calcula_tamanho_vales(t):
                     if vale not in vales:
                         vales += (vale, )
 
+    return len(vales)
+
+
+def calcula_tamanho_vales(t):
+    if not eh_territorio(t):
+        raise ValueError('calcula_tamanho_vales: argumento invalido')
+    
+    visitados = set()
+    vales = set()
+    
+    for y in range(len(t[0])):
+        for x in range(len(t)):
+            intersecao = (chr(65 + x), y + 1)
+            
+            if intersecao not in vales and not eh_intersecao_livre(t, intersecao):
+                vale = obtem_vale(t, intersecao)
+                vales.update(vale)
+                visitados.update(vale)
+    
     return len(vales)
