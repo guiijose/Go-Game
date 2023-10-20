@@ -1,13 +1,14 @@
 # This is the Python script for your project
 # projeto 1
 
-def eh_territorio(arg): 
+def eh_territorio(arg): # assert not true (já coloquei que as coordenadas não podem ser floats)
     if type(arg) is not tuple or not 0 < len(arg) < 27:
         return False
     try:
         altura = len(arg[0])
     except TypeError:
-        return False  
+        return False
+        
     for coluna in arg:
         if type(coluna) is not tuple or not 0 < len(coluna) < 100  or len(coluna) != altura:
             return False
@@ -26,9 +27,7 @@ def obtem_ultima_intersecao(t):
 def eh_intersecao(arg):
     if not isinstance(arg, tuple):
         return False
-    if (len(arg) != 2 or not isinstance(arg[0], str) 
-        or not isinstance(arg[1], int) or not arg[0].isupper() 
-        or not 1 <= arg[1] <= 99 or len(arg[0]) != 1):
+    if len(arg) != 2 or not isinstance(arg[0], str) or not isinstance(arg[1], int) or not arg[0].isupper() or not 1 <= arg[1] <= 99 or len(arg[0]) != 1:
         return False
     return True
 
@@ -117,32 +116,23 @@ def obtem_cadeia(t, i):
     
     def adjacentes_tipo(t, i): 
         adjacentes = obtem_intersecoes_adjacentes(t, i)
-        adjacentes_livres = ()
-        for adjacente in adjacentes:
-            if eh_intersecao_livre(t, i) == eh_intersecao_livre(t, adjacente):
-                adjacentes_livres += (adjacente,)
+        adjacentes_livres = tuple(adjacente for adjacente in adjacentes if eh_intersecao_livre(t, adjacente) == eh_intersecao_livre(t, i))
         return adjacentes_livres
     
-    def expandir_cadeia(cadeia):
-        adicionado = False
-        novas_intersecoes = []
-        for intersecao in cadeia:
-            nova_cadeia = adjacentes_tipo(t, intersecao)
-            for nova_intersecao in nova_cadeia:
-                if nova_intersecao not in cadeia and nova_intersecao not in novas_intersecoes:
-                    novas_intersecoes.append(nova_intersecao)
-                    adicionado = True
-        return tuple(cadeia) + tuple(novas_intersecoes), adicionado
-
-    
     cadeia = adjacentes_tipo(t, i) + (i,)
+
     adicionado = True
-    
     while adicionado:
-        cadeia, adicionado = expandir_cadeia(cadeia)
+        adicionado = False
+        novos_adjacentes = ()
+        for adjacente in cadeia:
+            aux = tuple(adj for adj in adjacentes_tipo(t, adjacente) if adj not in cadeia and adj not in novos_adjacentes)
+            novos_adjacentes += aux
+            if aux:
+                adicionado = True
+        cadeia += novos_adjacentes
 
     return ordena_intersecoes(cadeia)
-
 
 def obtem_vale(t, i):
     if not eh_intersecao_valida(t, i) or eh_intersecao_livre(t, i):
@@ -150,16 +140,8 @@ def obtem_vale(t, i):
     
     def adjacentes_tipo_diferente(t, i):
         adjacentes = obtem_intersecoes_adjacentes(t, i)
-        adjacentes_diferentes = ()
-        for adjacente in adjacentes:
-            if eh_intersecao_livre(t, i):
-                if not eh_intersecao_livre(t, adjacente):
-                    adjacentes_diferentes += (adjacente,)
-            else:
-                if eh_intersecao_livre(t, adjacente):
-                    adjacentes_diferentes += (adjacente,)
-
-        return adjacentes_diferentes
+        adjacentes_diferente = tuple(adjacente for adjacente in adjacentes if eh_intersecao_livre(t, adjacente) != eh_intersecao_livre(t, i))
+        return adjacentes_diferente
 
 
     cadeia = obtem_cadeia(t, i)
@@ -190,15 +172,12 @@ def calcula_numero_montanhas(t):
 def calcula_numero_cadeias_montanhas(t):
     if not eh_territorio(t):
         raise ValueError("calcula_numero_cadeias_montanhas: argumento invalido")
-    cadeia_unica = set()
-    
+    cadeias = ()
     for y in range(len(t[0])):
         for x in range(len(t)):
-            if t[x][y] == 1:
-                cadeia = obtem_cadeia(t, (chr(65 + x), y + 1))
-                cadeia_unica.add(cadeia)
-    
-    return len(cadeia_unica)
+            if t[x][y] == 1 and obtem_cadeia(t, (chr(65 + x), y + 1)) not in cadeias:
+                cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
+    return len(cadeias)
 
 def calcula_tamanho_vales(t):
     if not eh_territorio(t):
@@ -213,4 +192,3 @@ def calcula_tamanho_vales(t):
                         vales += (vale, )
 
     return len(vales)
-
