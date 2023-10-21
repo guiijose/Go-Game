@@ -147,9 +147,8 @@ def obtem_vale(t, i):
     cadeia = obtem_cadeia(t, i)
     vales = ()
     for montanha in cadeia:
-        for vale in adjacentes_tipo_diferente(t, montanha):
-            if vale not in vales:
-                vales += (vale,)
+        vales += tuple(vale for vale in adjacentes_tipo_diferente(t, montanha) if vale not in vales)
+
     return ordena_intersecoes(vales)
 
 def verifica_conexao(t, i1, i2):
@@ -173,16 +172,19 @@ def calcula_numero_cadeias_montanhas(t):
     if not eh_territorio(t):
         raise ValueError("calcula_numero_cadeias_montanhas: argumento invalido")
     cadeias = ()
+    contador = 0
     for y in range(len(t[0])):
         for x in range(len(t)):
-            if t[x][y] == 1 and obtem_cadeia(t, (chr(65 + x), y + 1)) not in cadeias:
-                cadeias += (obtem_cadeia(t, (chr(65 + x), y + 1)),)
-    return len(cadeias)
+            if t[x][y] == 1 and (chr(65 + x), y + 1) not in cadeias:
+                cadeias += obtem_cadeia(t, (chr(65 + x), y + 1))
+                contador += 1
+    return contador
 
 def calcula_tamanho_vales(t):
     if not eh_territorio(t):
         raise ValueError( 'calcula_tamanho_vales: argumento invalido')
     vales = ()
+    contador = 0
     for y in range(len(t[0])):
         for x in range(len(t)):
             if not eh_intersecao_livre(t, (chr(65 + x), y + 1)):
@@ -192,3 +194,4 @@ def calcula_tamanho_vales(t):
                         vales += (vale, )
 
     return len(vales)
+
