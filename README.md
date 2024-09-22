@@ -14,8 +14,8 @@ This is a Python implementation of the **Go** board game, a classic strategy gam
 The project's tests are located in the `public/` folder. To run the tests, use the following command:
 
 ```bash
-python -m unittest discover -s public
-
+python -m unittest discover -s public 
+```
 ## Requirements
 
 - Python 3.x
