@@ -30,3 +30,7 @@ python -m unittest discover -s public
    ```
    python FP2324P2.py
    ```
+3. Or, if you are in Windows run this:
+   ```
+   python3 FP2324.py
+   ```
