@@ -26,11 +26,13 @@ python -m unittest discover -s public
    ```bash
    git clone https://github.com/yourusername/go-game.git
    ```
-2. Run the following command:
+2. Edit the code and call the function ```go(tamanho, ib, ip)``` where **tamanho** is the size of the board (9, 13, or 19) and **ib** and **ip** are the lists with the positions of the whites and blacks, respectively.
+3. Then run the following command:
    ```
    python main.py
    ```
-3. Or, if you are in Mac or Linux run this:
+4. Or if in Mac or Linux use:
    ```
    python3 main.py
    ```
+   
