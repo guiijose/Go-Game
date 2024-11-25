@@ -28,9 +28,9 @@ python -m unittest discover -s public
    ```
 2. Run the following command:
    ```
-   python FP2324P2.py
+   python main.py
    ```
 3. Or, if you are in Mac or Linux run this:
    ```
-   python3 FP2324.py
+   python3 main.py
    ```
