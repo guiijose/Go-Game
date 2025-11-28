@@ -17,7 +17,7 @@ This is a Python implementation of the **Go** board game, a classic strategy gam
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/go-game.git
+   git clone https://github.com/guiijose/go-game.git
    ```
 2. Edit the code and call the function ```go(tamanho, ib, ip)``` where **tamanho** is the size of the board (9, 13, or 19) and **ib** and **ip** are the lists with the positions of the whites and blacks, respectively.
 3. Then run the following command:
